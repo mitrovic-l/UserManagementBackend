@@ -22,20 +22,24 @@ public class JwtUtil {
         return extractAllClaims(token).getSubject();
     }
 
-    public List<Permission> extractPermisije(String token){
-        return (List<Permission>) extractAllClaims(token).get("permisije");
+    public List<RoleType> extractRoles(String token){
+        return (List<RoleType>) extractAllClaims(token).get("roles");
     }
 
     public boolean isTokenExpired(String token){
         return extractAllClaims(token).getExpiration().before(new Date());
     }
 
-    //TODO: Proveri sta je lakse, da li da se stavlja RoleTypes set u token ili Permission pa da se svaki put cupa RoleTypes preko njih.
-    public String generateToken(String email, Set<Permission> permisije){
+    public String generateToken(String email, List<Permission> permisije){
         Map<String, Object> claims = new HashMap<>();
+        List<RoleType> roles = new ArrayList<>();
+        for (Permission permission : permisije){
+            roles.add( permission.getRole());
+        }
+        System.out.println("-----------> Pokusavam da generisem token, roles za korisnika su: " + roles);
         return Jwts.builder()
                 .setClaims(claims)
-                .claim("permisije", permisije)
+                .claim("roles", roles)
                 .setSubject(email)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10))
@@ -47,13 +51,9 @@ public class JwtUtil {
     }
 
     public boolean authorize(String path, String token){
-        List<Permission> permissions = extractPermisije(token);
+        List<RoleType> roles = extractRoles(token);
         if (path.startsWith("/user")){
             String path2 = path.substring(6);
-            List<RoleType> roles = new ArrayList<>();
-            for (Permission p : permissions){
-                roles.add(p.getRole());
-            }
             if (path2.equals("all") && roles.contains(RoleType.can_read.toString())){
                 return true;
             }
