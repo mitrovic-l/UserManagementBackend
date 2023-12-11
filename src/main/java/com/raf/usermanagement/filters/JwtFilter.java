@@ -30,31 +30,38 @@ public class JwtFilter extends OncePerRequestFilter {
     @SneakyThrows
     @Override
     protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) throws ServletException, IOException {
+        try {
+            System.out.println("-----------> doFilterInternal");
+            String authHeader = httpServletRequest.getHeader("Authorization");
+            String jwt = null;
+            String username = null;
 
-        String authHeader = httpServletRequest.getHeader("Authorization");
-        String jwt = null;
-        String username = null;
-
-        if(authHeader != null && authHeader.startsWith("Bearer ")) {
-            jwt = authHeader.substring(7);
-            username = jwtUtil.extractUsername(jwt);
-        }
-
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-
-            UserDetails userDetails = this.userService.loadUserDetailsByEmail(username);
-            User user = this.userService.loadUserByEmail(username);
-            String path = httpServletRequest.getRequestURI().substring(httpServletRequest.getContextPath().length());
-            if (jwtUtil.validateToken(jwt, userDetails)) {
-                UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities());
-
-                usernamePasswordAuthenticationToken
-                        .setDetails(new WebAuthenticationDetailsSource().buildDetails(httpServletRequest));
-                SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-
+            if(authHeader != null && authHeader.startsWith("Bearer ")) {
+                jwt = authHeader.substring(7);
+                username = jwtUtil.extractUsername(jwt);
             }
+
+            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                System.out.println("-----------> Uso u if u doFilterInternal");
+                UserDetails userDetails = this.userService.loadUserDetailsByEmail(username);
+                User user = this.userService.loadUserByEmail(username);
+                String path = httpServletRequest.getRequestURI().substring(httpServletRequest.getContextPath().length());
+
+                if (jwtUtil.validateToken(jwt, userDetails)) {
+                    System.out.println("-----------> Uso u if u ifu " + userDetails.getAuthorities());
+                    UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
+                            userDetails, null, userDetails.getAuthorities());
+
+                    usernamePasswordAuthenticationToken
+                            .setDetails(new WebAuthenticationDetailsSource().buildDetails(httpServletRequest));
+                    SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+                }
+            }
+            filterChain.doFilter(httpServletRequest, httpServletResponse);
+        } catch (Exception e) {
+            // Ovde možete logovati grešku i/ili poslati odgovarajući HTTP odgovor
+            httpServletResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Došlo je do greške.");
         }
-        filterChain.doFilter(httpServletRequest, httpServletResponse);
     }
+
 }

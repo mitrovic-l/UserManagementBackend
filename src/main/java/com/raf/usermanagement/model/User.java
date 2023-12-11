@@ -1,6 +1,8 @@
 package com.raf.usermanagement.model;
 
 import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,6 +28,7 @@ public class User {
     @Column
     private String password;
 
+    @JsonIgnore
     @Cascade(org.hibernate.annotations.CascadeType.PERSIST)
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(

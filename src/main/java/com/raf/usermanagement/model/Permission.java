@@ -1,6 +1,8 @@
 package com.raf.usermanagement.model;
 
 import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,6 +20,7 @@ public class Permission {
     @Enumerated(EnumType.STRING)
     private RoleType role;
 
+    @JsonIgnore
     @ManyToMany
     @JoinTable(
             name = "user_permission",
