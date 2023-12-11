@@ -1,0 +1,52 @@
+package com.raf.usermanagement.bootstrap;
+
+import com.raf.usermanagement.model.Permission;
+import com.raf.usermanagement.model.RoleType;
+import com.raf.usermanagement.model.User;
+import com.raf.usermanagement.repositories.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Component
+public class BootstrapData implements CommandLineRunner {
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    @Autowired
+    public BootstrapData(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
+
+    @Override
+    public void run(String... args) throws Exception {
+        System.out.println("-----------> Pokrecem run i ucitavam podatke. <-----------");
+        User user = new User();
+        user.setEmail("luka@raf.rs");
+        List<Permission> roles = new ArrayList<>();
+        Permission p1 = new Permission();
+        Permission p2 = new Permission();
+        Permission p3 = new Permission();
+        Permission p4 = new Permission();
+        p1.setRole(RoleType.can_create);
+        p2.setRole(RoleType.can_delete);
+        p3.setRole(RoleType.can_update);
+        p4.setRole(RoleType.can_read);
+        roles.add(p1);
+        roles.add(p2);
+        roles.add(p3);
+        roles.add(p4);
+        user.setRoles( roles );
+        user.setFirstname("Luka");
+        user.setLastname("Mitrovic");
+        user.setPassword(this.passwordEncoder.encode("luka"));
+
+        this.userRepository.save(user);
+        System.out.println("-----------> Podaci ucitani. <-----------");
+    }
+}
