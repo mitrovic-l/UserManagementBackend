@@ -11,6 +11,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,10 +39,36 @@ public class UserController {
     }
 
     @PostMapping(value = "", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> createUser(@RequestBody User user){
+    public ResponseEntity<?> createUser(@RequestBody User user, @RequestParam(value = "roleIDs", required = false) Integer[] ids){
         System.out.println(SecurityContextHolder.getContext().getAuthentication().getAuthorities());
         if (SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(RoleType.can_create)){
             user.setPassword(this.passwordEncoder.encode(user.getPassword()));
+            Permission p1 = new Permission();
+            Permission p2 = new Permission();
+            Permission p3 = new Permission();
+            Permission p4 = new Permission();
+            p1.setRole(RoleType.can_create);
+            p2.setRole(RoleType.can_delete);
+            p3.setRole(RoleType.can_update);
+            p4.setRole(RoleType.can_read);
+            List<Permission> permissions = new ArrayList<>();
+            if (ids.length != 0) {
+                for (Integer id : ids) {
+                    if (id == 1) {
+                        permissions.add(p1);
+                    }
+                    if (id == 2) {
+                        permissions.add(p2);
+                    }
+                    if (id == 3) {
+                        permissions.add(p3);
+                    }
+                    if (id == 4) {
+                        permissions.add(p4);
+                    }
+                }
+            }
+            user.setRoles( permissions );
             return ResponseEntity.ok(userService.createNewUser(user));
         } else {
             return ResponseEntity.status(403).body("Nemate dozvolu za kreiranje novog korisnika.");
