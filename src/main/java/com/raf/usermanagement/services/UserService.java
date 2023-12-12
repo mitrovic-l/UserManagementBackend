@@ -67,4 +67,18 @@ public class UserService implements UserDetailsService {
     public User save(User user){
         return this.userRepository.save(user);
     }
+    public boolean isEmailAvailable(String email){
+        User check = this.userRepository.findByEmail(email);
+        if (check == null)
+            return true;
+        return false;
+    }
+    public User createNewUser(User user) throws UsernameNotFoundException{
+        if (!isEmailAvailable(user.getEmail())){
+            throw new UsernameNotFoundException("Korisnik sa takvim mailom vec postoji.");
+        }
+        else {
+            return this.userRepository.save(user);
+        }
+    }
 }

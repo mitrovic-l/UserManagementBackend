@@ -1,16 +1,14 @@
 package com.raf.usermanagement.controllers;
 
 import com.raf.usermanagement.model.RoleType;
+import com.raf.usermanagement.model.User;
 import com.raf.usermanagement.services.UserService;
 import com.raf.usermanagement.utils.JwtUtil;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @CrossOrigin
@@ -32,8 +30,20 @@ public class UserController {
         if (SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(RoleType.can_read)){
             return ResponseEntity.ok(userService.findAll());
         } else {
-            return ResponseEntity.status(401).body("Nemate dozvolu za pregled korisnika.");
+            return ResponseEntity.status(403).body("Nemate dozvolu za pregled korisnika.");
         }
     }
+
+    @PostMapping(value = "", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> createUser(@RequestBody User user){
+        System.out.println(SecurityContextHolder.getContext().getAuthentication().getAuthorities());
+        if (SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(RoleType.can_create)){
+            user.setPassword(this.passwordEncoder.encode(user.getPassword()));
+            return ResponseEntity.ok(userService.createNewUser(user));
+        } else {
+            return ResponseEntity.status(403).body("Nemate dozvolu za kreiranje novog korisnika.");
+        }
+    }
+
 
 }
