@@ -45,5 +45,16 @@ public class UserController {
         }
     }
 
+    @PutMapping(value = "/update", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> updateUser(@RequestBody User user){
+        if (SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(RoleType.can_update)){
+            User user1 = userService.getUser(user.getEmail());
+            user.setPassword(user1.getPassword());
+            return ResponseEntity.ok(userService.updateUser(user));
+        } else {
+            return ResponseEntity.status(403).body("Nemate dozvolu da menjate podatke korisnicima.");
+        }
+    }
+
 
 }
