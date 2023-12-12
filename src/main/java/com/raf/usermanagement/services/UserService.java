@@ -90,4 +90,7 @@ public class UserService implements UserDetailsService {
         existingUser.setLastname(user.getLastname());
         return this.userRepository.save(existingUser);
     }
+    public Optional<User> getOptionalUser(Integer id){
+        return this.userRepository.findById(id);
+    }
 }

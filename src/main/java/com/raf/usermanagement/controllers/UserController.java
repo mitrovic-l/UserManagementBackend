@@ -10,6 +10,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.Optional;
+
 @RestController
 @CrossOrigin
 @RequestMapping("/user")
@@ -26,7 +29,6 @@ public class UserController {
 
     @GetMapping(value = "/all", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getAllUsers(){
-        System.out.println("-------------> Context: "+SecurityContextHolder.getContext().getAuthentication().getAuthorities());
         if (SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(RoleType.can_read)){
             return ResponseEntity.ok(userService.findAll());
         } else {
@@ -54,6 +56,25 @@ public class UserController {
         } else {
             return ResponseEntity.status(403).body("Nemate dozvolu da menjate podatke korisnicima.");
         }
+    }
+
+    @DeleteMapping(value = "/delete/{id}")
+    public ResponseEntity<?> deleteUser(@PathVariable Integer id){
+        if (SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(RoleType.can_delete)){
+            Optional<User> optionalUser = userService.findById(id);
+            System.out.println(optionalUser);
+            if (optionalUser.isPresent()){
+                userService.deleteById(id);
+                return ResponseEntity.ok().build();
+            }
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.status(403).body("Nemate dozvolu da brisete korisnike.");
+    }
+
+    @GetMapping(value = "/roles")
+    public List<RoleType> getRoles(){
+        return (List<RoleType>) SecurityContextHolder.getContext().getAuthentication().getAuthorities();
     }
 
 
