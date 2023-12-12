@@ -93,4 +93,11 @@ public class UserService implements UserDetailsService {
     public Optional<User> getOptionalUser(Integer id){
         return this.userRepository.findById(id);
     }
+    public List<Permission> permissions(Integer id){
+        Optional<User> user = findById(id);
+        if (user.isPresent()){
+            return user.get().getRoles();
+        }
+        throw new UsernameNotFoundException("Korisnik sa id-em " + id + " nije pronadjen.");
+    }
 }

@@ -1,5 +1,6 @@
 package com.raf.usermanagement.controllers;
 
+import com.raf.usermanagement.model.Permission;
 import com.raf.usermanagement.model.RoleType;
 import com.raf.usermanagement.model.User;
 import com.raf.usermanagement.services.UserService;
@@ -75,6 +76,13 @@ public class UserController {
     @GetMapping(value = "/roles")
     public List<RoleType> getRoles(){
         return (List<RoleType>) SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+    }
+    @GetMapping(value = "/roles/{id}")
+    public List<Permission> getPermissionsById(@PathVariable Integer id){
+        if (SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(RoleType.can_read)) {
+            return this.userService.permissions(id);
+        }
+        return null;
     }
 
 

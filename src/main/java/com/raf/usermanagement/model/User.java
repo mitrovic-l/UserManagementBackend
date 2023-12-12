@@ -9,6 +9,7 @@ import lombok.Setter;
 import org.hibernate.annotations.Cascade;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 
 @Entity
