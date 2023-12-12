@@ -85,5 +85,10 @@ public class UserController {
         return null;
     }
 
+    @GetMapping(value = "/find/{email}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public User findUser(@PathVariable String email){
+        return this.userService.getUser(email);
+    }
+
 
 }

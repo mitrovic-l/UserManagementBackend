@@ -29,7 +29,6 @@ public class User {
     @Column
     private String password;
 
-    @JsonIgnore
     @Cascade(org.hibernate.annotations.CascadeType.PERSIST)
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(

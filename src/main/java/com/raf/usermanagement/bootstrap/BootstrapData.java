@@ -10,6 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Component
@@ -52,9 +53,11 @@ public class BootstrapData implements CommandLineRunner {
         user2.setEmail("proba@raf.rs");
         user2.setPassword(this.passwordEncoder.encode("proba"));
         user2.setFirstname("Proba");
-        user2.setFirstname("Probic");
-        roles.remove(p4);
-        user2.setRoles( new ArrayList<>());
+        user2.setLastname("Probic");
+        Permission p5 = new Permission();
+        p5.setRole(RoleType.can_read);
+        user2.setRoles(List.of(p5));
+
         this.userRepository.save(user2);
         System.out.println("-----------> Podaci ucitani. <-----------");
     }
