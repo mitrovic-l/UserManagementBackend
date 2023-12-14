@@ -75,12 +75,49 @@ public class UserController {
         }
     }
 
-    @PutMapping(value = "/update", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> updateUser(@RequestBody User user){
+    @PutMapping(value = "/update/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> updateUser(@RequestBody User user,@PathVariable("id") Integer userId, @RequestParam(value = "roleIDs", required = false) Integer[] ids){
+        System.out.println("UPDATE USER U KONTROLERU");
         if (SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(RoleType.can_update)){
-            User user1 = userService.getUser(user.getEmail());
-            user.setPassword(user1.getPassword());
-            return ResponseEntity.ok(userService.updateUser(user));
+            Optional<User> user1 = userService.findById(userId);
+            System.out.println(" ---------> naso korisinka:  " + user1.get().getEmail() + user1.get().getFirstname() + user1.get().getRoles()) ;
+            user.setPassword(user1.get().getPassword());
+            System.out.println("-----------> permisije");
+            Permission create = new Permission();
+            Permission p2 = new Permission();
+            Permission p3 = new Permission();
+            Permission p4 = new Permission();
+            create.setRole(RoleType.can_create);
+            p2.setRole(RoleType.can_delete);
+            p3.setRole(RoleType.can_update);
+            p4.setRole(RoleType.can_read);
+            List<Permission> permissions = new ArrayList<>();
+            System.out.println("-----------> kraj permisija");
+            if (ids.length != 0) {
+                for (Integer id : ids) {
+                    if (id == 1) {
+                        create.setRole(RoleType.can_create);
+                        permissions.add(create);
+                    }
+                    if (id == 2) {
+                        p2.setRole(RoleType.can_delete);
+                        permissions.add(p2);
+                    }
+                    if (id == 3) {
+                        p3.setRole(RoleType.can_update);
+                        permissions.add(p3);
+                    }
+                    if (id == 4) {
+                        p4.setRole(RoleType.can_read);
+                        permissions.add(p4);
+                    }
+                }
+            }
+            user1.get().setRoles(permissions);
+            user1.get().setFirstname(user.getFirstname());
+            user1.get().setLastname(user.getLastname());
+            System.out.println("Zovem save");
+            return ResponseEntity.ok(userService.save(user1.get()));
         } else {
             return ResponseEntity.status(403).body("Nemate dozvolu da menjate podatke korisnicima.");
         }

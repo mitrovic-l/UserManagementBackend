@@ -84,11 +84,8 @@ public class UserService implements UserDetailsService {
     public User getUser(String email){
         return this.userRepository.findByEmail(email);
     }
-    public User updateUser(User user){
-        User existingUser = getUser(user.getEmail());
-        existingUser.setFirstname(user.getFirstname());
-        existingUser.setLastname(user.getLastname());
-        return this.userRepository.save(existingUser);
+    public User updateUser(User user, Integer id){
+        return this.userRepository.save(user);
     }
     public Optional<User> getOptionalUser(Integer id){
         return this.userRepository.findById(id);
