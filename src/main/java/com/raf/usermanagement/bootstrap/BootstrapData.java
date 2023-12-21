@@ -56,7 +56,7 @@ public class BootstrapData implements CommandLineRunner {
         user2.setLastname("Probic");
         Permission p5 = new Permission();
         p5.setRole(RoleType.can_read);
-        user2.setRoles(List.of(p5));
+        //user2.setRoles(List.of(p5));
 
         this.userRepository.save(user2);
         System.out.println("-----------> Podaci ucitani. <-----------");

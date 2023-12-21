@@ -43,32 +43,30 @@ public class UserController {
         System.out.println(SecurityContextHolder.getContext().getAuthentication().getAuthorities());
         if (SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(RoleType.can_create)){
             user.setPassword(this.passwordEncoder.encode(user.getPassword()));
-            Permission p1 = new Permission();
-            Permission p2 = new Permission();
-            Permission p3 = new Permission();
-            Permission p4 = new Permission();
-            p1.setRole(RoleType.can_create);
-            p2.setRole(RoleType.can_delete);
-            p3.setRole(RoleType.can_update);
-            p4.setRole(RoleType.can_read);
-            List<Permission> permissions = new ArrayList<>();
+            List<Permission> permissions = this.userService.allPermissions();
+            //Izmenjeno
+            List<Permission> permissionsList = new ArrayList<>();
             if (ids.length != 0) {
                 for (Integer id : ids) {
                     if (id == 1) {
-                        permissions.add(p1);
+                        System.out.println("Dodata permisija 1");
+                        permissionsList.add(permissions.get(0));
                     }
                     if (id == 2) {
-                        permissions.add(p2);
+                        System.out.println("Dodata permisija 2");
+                        permissionsList.add(permissions.get(1));
                     }
                     if (id == 3) {
-                        permissions.add(p3);
+                        System.out.println("Dodata permisija 3");
+                        permissionsList.add(permissions.get(2));
                     }
                     if (id == 4) {
-                        permissions.add(p4);
+                        System.out.println("Dodata permisija 4");
+                        permissionsList.add(permissions.get(3));
                     }
                 }
             }
-            user.setRoles( permissions );
+            user.setRoles( permissionsList );
             return ResponseEntity.ok(userService.createNewUser(user));
         } else {
             return ResponseEntity.status(403).body("Nemate dozvolu za kreiranje novog korisnika.");
@@ -83,37 +81,30 @@ public class UserController {
             System.out.println(" ---------> naso korisinka:  " + user1.get().getEmail() + user1.get().getFirstname() + user1.get().getRoles()) ;
             user.setPassword(user1.get().getPassword());
             System.out.println("-----------> permisije");
-            Permission create = new Permission();
-            Permission p2 = new Permission();
-            Permission p3 = new Permission();
-            Permission p4 = new Permission();
-            create.setRole(RoleType.can_create);
-            p2.setRole(RoleType.can_delete);
-            p3.setRole(RoleType.can_update);
-            p4.setRole(RoleType.can_read);
-            List<Permission> permissions = new ArrayList<>();
-            System.out.println("-----------> kraj permisija");
+            List<Permission> permissions = this.userService.allPermissions();
+            List<Permission> permissionsList = new ArrayList<>();
             if (ids.length != 0) {
                 for (Integer id : ids) {
                     if (id == 1) {
-                        create.setRole(RoleType.can_create);
-                        permissions.add(create);
+                        System.out.println("Dodata permisija 1");
+                        permissionsList.add(permissions.get(0));
                     }
                     if (id == 2) {
-                        p2.setRole(RoleType.can_delete);
-                        permissions.add(p2);
+                        System.out.println("Dodata permisija 2");
+                        permissionsList.add(permissions.get(1));
                     }
                     if (id == 3) {
-                        p3.setRole(RoleType.can_update);
-                        permissions.add(p3);
+                        System.out.println("Dodata permisija 3");
+                        permissionsList.add(permissions.get(2));
                     }
                     if (id == 4) {
-                        p4.setRole(RoleType.can_read);
-                        permissions.add(p4);
+                        System.out.println("Dodata permisija 4");
+                        permissionsList.add(permissions.get(3));
                     }
                 }
             }
-            user1.get().setRoles(permissions);
+            user.setRoles( permissionsList );
+            user1.get().setRoles( permissionsList );
             user1.get().setFirstname(user.getFirstname());
             user1.get().setLastname(user.getLastname());
             System.out.println("Zovem save");
@@ -152,6 +143,11 @@ public class UserController {
     @GetMapping(value = "/find/{email}", produces = MediaType.APPLICATION_JSON_VALUE)
     public User findUser(@PathVariable String email){
         return this.userService.getUser(email);
+    }
+
+    @GetMapping(value = "/allRoles", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<Permission> allRoles(){
+        return this.userService.allPermissions();
     }
 
 

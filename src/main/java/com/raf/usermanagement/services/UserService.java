@@ -3,6 +3,7 @@ package com.raf.usermanagement.services;
 import com.raf.usermanagement.model.Permission;
 import com.raf.usermanagement.model.RoleType;
 import com.raf.usermanagement.model.User;
+import com.raf.usermanagement.repositories.PermissionRepository;
 import com.raf.usermanagement.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
@@ -17,10 +18,12 @@ import java.util.*;
 public class UserService implements UserDetailsService {
 
     private UserRepository userRepository;
+    private PermissionRepository permissionRepository;
 
     @Autowired
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, PermissionRepository permissionRepository) {
         this.userRepository = userRepository;
+        this.permissionRepository = permissionRepository;
     }
 
     @Override
@@ -96,5 +99,8 @@ public class UserService implements UserDetailsService {
             return user.get().getRoles();
         }
         throw new UsernameNotFoundException("Korisnik sa id-em " + id + " nije pronadjen.");
+    }
+    public List<Permission> allPermissions(){
+        return this.permissionRepository.findAll();
     }
 }
